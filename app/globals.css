@@ -1,0 +1,78 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+  background: #faf8f1;
+  color: #1f2933;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  max-width: 100%;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  max-width: 100%;
+  overflow-x: clip;
+  background: #faf8f1;
+  color: #1f2933;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+img,
+svg,
+video,
+canvas {
+  max-width: 100%;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+::selection {
+  background: rgba(215, 173, 53, 0.32);
+}
+
+.gold-crack {
+  position: relative;
+  overflow: hidden;
+}
+
+.gold-crack::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(116deg, transparent 0 42%, rgba(215, 173, 53, 0.24) 42.2% 42.7%, transparent 43% 100%),
+    linear-gradient(33deg, transparent 0 62%, rgba(215, 173, 53, 0.16) 62.2% 62.5%, transparent 62.8% 100%);
+  opacity: 0.7;
+}
+
+.dashboard-grid {
+  background-image:
+    linear-gradient(rgba(31, 41, 51, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(31, 41, 51, 0.05) 1px, transparent 1px);
+  background-size: 36px 36px;
+}
+
+.scrollbar-thin {
+  scrollbar-width: thin;
+}
+
+.break-anywhere {
+  overflow-wrap: anywhere;
+  word-break: normal;
+}

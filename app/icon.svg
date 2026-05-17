@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="KintsugiOps AI">
+  <rect width="64" height="64" rx="14" fill="#1f2933" />
+  <path
+    d="M16 42a18 18 0 1 1 32 0"
+    fill="none"
+    stroke="#f9e8a9"
+    stroke-width="5"
+    stroke-linecap="round"
+  />
+  <path d="M32 40 43 27" fill="none" stroke="#d7ad35" stroke-width="5" stroke-linecap="round" />
+  <circle cx="32" cy="42" r="3.5" fill="#f9e8a9" />
+  <path
+    d="M46 9 40 21 47 26 40 38 48 52"
+    fill="none"
+    stroke="#d7ad35"
+    stroke-width="3"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+</svg>
