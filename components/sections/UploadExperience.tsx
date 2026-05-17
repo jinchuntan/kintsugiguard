@@ -75,7 +75,7 @@ export function UploadExperience() {
             </div>
           </div>
 
-          <div className="mt-5 grid gap-4 md:grid-cols-3">
+          <div className="mt-5 grid gap-4 sm:grid-cols-2 md:grid-cols-3">
             {demoAudits.map((audit) => {
               const selected = audit.id === auditId;
               return (
@@ -166,7 +166,7 @@ export function UploadExperience() {
           </div>
         </div>
 
-        <div className="mt-5 grid gap-6 lg:grid-cols-2">
+        <div className="mt-5 grid gap-6 md:grid-cols-2">
           <div>
             <label className="flex min-h-48 cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-ink/20 bg-porcelain px-4 py-8 text-center transition hover:border-gold-300 hover:bg-gold-50/40">
               <ImageIcon className="h-10 w-10 text-gold-700" aria-hidden />

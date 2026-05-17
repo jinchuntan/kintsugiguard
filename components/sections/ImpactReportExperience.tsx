@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { ClipboardCheck, Download, FileText, Leaf, TrendingUp, WalletCards } from "lucide-react";
+import { useCallback, useEffect, useState } from "react";
+import { ClipboardCheck, Download, FileText, Leaf, Loader2, Sparkles, TrendingUp, WalletCards } from "lucide-react";
 import { MetricCard } from "@/components/dashboard/MetricCard";
 import { PageFrame } from "@/components/dashboard/PageFrame";
 import { RiskPill } from "@/components/dashboard/StatusPill";
@@ -11,7 +11,46 @@ import { formatCarbon, formatCurrency } from "@/lib/utils";
 export function ImpactReportExperience() {
   const { run } = useAuditRun();
   const [copied, setCopied] = useState(false);
-  const { report, audit, repairPlan } = run;
+  const [aiSummary, setAiSummary] = useState<string | null>(null);
+  const [aiLoading, setAiLoading] = useState(false);
+  const { report, audit, repairPlan, governance } = run;
+
+  const fetchAiSummary = useCallback(async () => {
+    setAiLoading(true);
+    try {
+      const findings = audit.findings
+        .slice(0, 5)
+        .map((f) => f.title)
+        .join(", ");
+      const res = await fetch("/api/summary", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          auditName: audit.name,
+          findings,
+          savings: formatCurrency(report.monthlySavingsUsd),
+          carbon: formatCarbon(report.monthlyCarbonReductionKgCO2e),
+          scoreBefore: report.scoreBefore,
+          scoreAfter: report.scoreAfter,
+          governanceApproved: governance.approvedActions,
+          governanceBlocked: governance.blockedActions,
+          governanceReview: governance.humanReviewRequired
+        })
+      });
+      const data = (await res.json()) as { summary: string | null; mode: string };
+      if (data.summary && data.mode !== "mock") {
+        setAiSummary(data.summary);
+      }
+    } catch {
+      // Keep default summary
+    } finally {
+      setAiLoading(false);
+    }
+  }, [audit, report, governance]);
+
+  useEffect(() => {
+    fetchAiSummary();
+  }, [fetchAiSummary]);
 
   const downloadMarkdown = () => {
     const blob = new Blob([report.markdown], { type: "text/markdown;charset=utf-8" });
@@ -65,7 +104,7 @@ export function ImpactReportExperience() {
           tone="blue"
         />
         <MetricCard
-          label="Kintsugi Score"
+          label="KintsugiGuard Score"
           value={`${report.scoreBefore} to ${report.scoreAfter}`}
           detail="Health after repair plan"
           icon={<FileText className="h-5 w-5" aria-hidden />}
@@ -76,8 +115,21 @@ export function ImpactReportExperience() {
       <section className="mt-6 grid gap-6 lg:grid-cols-[0.85fr_1.15fr]">
         <aside className="space-y-6">
           <article className="rounded-lg border border-ink/10 bg-white p-5 shadow-soft">
-            <h2 className="text-lg font-semibold text-ink">Executive summary</h2>
-            <p className="mt-3 text-sm leading-7 text-graphite">{report.executiveSummary}</p>
+            <div className="flex items-center justify-between gap-3">
+              <h2 className="text-lg font-semibold text-ink">Executive summary</h2>
+              {aiSummary ? (
+                <span className="inline-flex items-center gap-1 rounded-md bg-emerald-50 px-2 py-1 text-xs font-semibold text-emerald-800 ring-1 ring-emerald-100">
+                  <Sparkles className="h-3 w-3" aria-hidden />
+                  Gemini
+                </span>
+              ) : aiLoading ? (
+                <span className="inline-flex items-center gap-1 rounded-md bg-gold-50 px-2 py-1 text-xs font-semibold text-gold-700 ring-1 ring-gold-100">
+                  <Loader2 className="h-3 w-3 animate-spin" aria-hidden />
+                  Generating
+                </span>
+              ) : null}
+            </div>
+            <p className="mt-3 text-sm leading-7 text-graphite">{aiSummary ?? report.executiveSummary}</p>
             <div className="mt-4 flex items-center gap-2">
               <span className="text-sm font-semibold text-graphite">Repair risk</span>
               <RiskPill risk={report.riskLevel} />
@@ -136,7 +188,7 @@ export function ImpactReportExperience() {
               </button>
             </div>
           </div>
-          <pre className="max-h-[720px] overflow-auto whitespace-pre-wrap p-5 text-sm leading-7 text-graphite">
+          <pre className="max-h-[60vh] overflow-auto whitespace-pre-wrap p-5 text-sm leading-7 text-graphite lg:max-h-[720px]">
             <code>{report.markdown}</code>
           </pre>
         </article>

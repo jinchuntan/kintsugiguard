@@ -98,16 +98,40 @@ export function GuideAssistant() {
 
   const guide = useMemo(() => guideFlow[pathname] ?? fallbackGuide, [pathname]);
 
-  const askQuestion = (rawQuestion: string) => {
+  const askQuestion = async (rawQuestion: string) => {
     const trimmed = rawQuestion.trim();
     if (!trimmed) return;
 
     setMessages((current) => [
       ...current,
-      { role: "user", content: trimmed },
-      { role: "assistant", content: getGuideAnswer(trimmed, guide) }
+      { role: "user", content: trimmed }
     ]);
     setQuestion("");
+
+    try {
+      const res = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          message: trimmed,
+          pageName: guide.name,
+          pageSummary: guide.summary
+        })
+      });
+      const data = (await res.json()) as { reply: string | null; mode: string };
+
+      if (data.reply && data.mode !== "mock") {
+        setMessages((current) => [...current, { role: "assistant", content: data.reply as string }]);
+        return;
+      }
+    } catch {
+      // Fall through to local answer
+    }
+
+    setMessages((current) => [
+      ...current,
+      { role: "assistant", content: getGuideAnswer(trimmed, guide) }
+    ]);
   };
 
   const onSubmit = (event: FormEvent<HTMLFormElement>) => {
@@ -206,7 +230,7 @@ export function GuideAssistant() {
               key={`${message.role}-${index}-${message.content}`}
               className={message.role === "assistant" ? "rounded-lg bg-porcelain p-3" : "ml-8 rounded-lg bg-ink p-3 text-white"}
             >
-              <p className={message.role === "assistant" ? "text-sm leading-6 text-graphite" : "text-sm leading-6 text-white"}>
+              <p className={message.role === "assistant" ? "break-words text-sm leading-6 text-graphite" : "break-words text-sm leading-6 text-white"}>
                 {message.content}
               </p>
             </div>

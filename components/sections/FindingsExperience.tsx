@@ -118,7 +118,7 @@ export function FindingsExperience() {
             <tbody className="divide-y divide-ink/10 bg-white">
               {audit.findings.map((finding) => (
                 <tr key={finding.id} className="align-top">
-                  <td className="max-w-64 px-4 py-4">
+                  <td className="max-w-64 break-words px-4 py-4">
                     <p className="font-semibold text-ink">{finding.title}</p>
                     <p className="mt-1 text-xs leading-5 text-graphite">{finding.expectedImpact}</p>
                   </td>
@@ -132,7 +132,7 @@ export function FindingsExperience() {
                   <td className="px-4 py-4">
                     <RiskPill risk={finding.riskLevel} />
                   </td>
-                  <td className="max-w-80 px-4 py-4 text-graphite">{finding.repairRecommendation}</td>
+                  <td className="max-w-80 break-words px-4 py-4 text-graphite">{finding.repairRecommendation}</td>
                 </tr>
               ))}
             </tbody>
